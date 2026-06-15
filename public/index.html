@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contact Form</title>
+</head>
+<body>
+  <h1>Contact Us</h1>
+  <input id="name" placeholder="Your name" /><br/>
+  <input id="email" placeholder="Your email" /><br/>
+  <textarea id="message" placeholder="Your message"></textarea><br/>
+  <button onclick="sendForm()">Send</button>
+  <p id="status"></p>
+
+  <script>
+    async function sendForm() {
+      const res = await fetch('/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          message: document.getElementById('message').value,
+        }),
+      });
+      const data = await res.json();
+      document.getElementById('status').textContent =
+        data.success ? '✅ Email sent!' : '❌ Failed: ' + data.error;
+    }
+  </script>
+</body>
+</html>
