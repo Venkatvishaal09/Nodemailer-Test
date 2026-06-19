@@ -1,32 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Contact Form</title>
-</head>
-<body>
-  <h1>Contact Us</h1>
-  <input id="name" placeholder="Your name" /><br/>
-  <input id="email" placeholder="Your email" /><br/>
-  <textarea id="message" placeholder="Your message"></textarea><br/>
-  <button onclick="sendForm()">Send</button>
-  <p id="status"></p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 480px;
+        margin: 60px auto;
+        padding: 0 20px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 16px;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+      #status {
+        margin-top: 14px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Contact Us</h1>
+    <form id="contactForm">
+      <label for="name">Name</label>
+      <input id="name" name="name" placeholder="Your name" required />
 
-  <script>
-    async function sendForm() {
-      const res = await fetch('/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: document.getElementById('name').value,
-          email: document.getElementById('email').value,
-          message: document.getElementById('message').value,
-        }),
-      });
-      const data = await res.json();
-      document.getElementById('status').textContent =
-        data.success ? '✅ Email sent!' : '❌ Failed: ' + data.error;
-    }
-  </script>
-</body>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="you@example.com"
+        required
+      />
+
+      <label for="message">Message</label>
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        placeholder="Your message"
+        required
+      ></textarea>
+
+      <label for="attachment">Attachment (optional)</label>
+      <input id="attachment" name="attachment" type="file" />
+
+      <button type="submit">Send</button>
+    </form>
+    <p id="status"></p>
+
+    <script>
+      document
+        .getElementById("contactForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const statusEl = document.getElementById("status");
+          statusEl.textContent = "Sending...";
+
+          const formData = new FormData(e.target);
+
+          try {
+            const res = await fetch("/send", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+            statusEl.textContent = data.success
+              ? " Message sent! Check your inbox for a confirmation."
+              : " " + data.error;
+          } catch (err) {
+            statusEl.textContent = " Network error. Is the server running?";
+          }
+        });
+    </script>
+  </body>
 </html>
