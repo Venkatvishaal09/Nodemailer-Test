@@ -1,7 +1,4 @@
-   MailPulse — Bulk Email Sender
-   A clean, professional UI that feels like a real product.
-   ═══════════════════════════════════════════════════════════ */
-
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
