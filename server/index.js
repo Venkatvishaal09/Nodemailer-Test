@@ -1,16 +1,28 @@
-require("dotenv").config({ quiet: true });
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env"), quiet: true });
 const express = require("express");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 const path = require("path");
+const db = require("./db");
+const authMiddleware = require("./middleware/auth");
+const authRoutes = require("./routes/auth");
+
+// Initialize database
+db.initDB();
 
 const app = express();
 app.use(express.json());
-app.use(express.static("public"));
+
+// In production, serve the built React client
+const clientDist = path.join(__dirname, "../client/dist");
+app.use(express.static(clientDist));
+
+// Mount auth routes
+app.use("/api/auth", authRoutes);
 
 // ─── File upload setup (for attachments) ──────────────────────────
 const upload = multer({
-  dest: path.join(__dirname, "uploads"),
+  dest: "/tmp",
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
 });
 
@@ -41,7 +53,8 @@ transporter
 // The front-end sends one email at a time in a loop, so this endpoint
 // handles a single recipient per request. The "subject" and HTML "message"
 // fields support the new bulk email UI.
-app.post("/send", upload.single("attachment"), async (req, res) => {
+// Protect this route with authMiddleware
+app.post("/send", authMiddleware, upload.single("attachment"), async (req, res) => {
   const { name, email, subject, message, replyTo } = req.body;
 
   if (!email || !message) {
@@ -101,7 +114,17 @@ app.post("/send", upload.single("attachment"), async (req, res) => {
   }
 });
 
+// Catch-all: serve React app for any non-API route (SPA support)
+app.get("{*splat}", (req, res) => {
+  res.sendFile(path.join(clientDist, "index.html"));
+});
+
 const PORT = process.env.PORT || 3005;
 app.listen(PORT, () =>
   console.log(` Server running on http://localhost:${PORT}`),
 );
+
+setInterval(() => {}, 1000 * 60 * 60); // Keep event loop alive
+
+
+module.exports = app;
