@@ -34,65 +34,54 @@ transporter.on("token", (token) => {
 // Verify connection as soon as the server starts
 transporter
   .verify()
-  .then(() => console.log(" Transporter ready — server can send emails"))
-  .catch((err) => console.error(" Transporter config error:", err.message));
+  .then(() => console.log("✅ Transporter ready — server can send emails"))
+  .catch((err) => console.error("❌ Transporter config error:", err.message));
 
-// ─── Route: handle contact form submission ────────────────────────
-// upload.single('attachment') reads one optional file field named "attachment"
+// ─── Route: handle email sending (supports bulk) ────────────────────
+// The front-end sends one email at a time in a loop, so this endpoint
+// handles a single recipient per request. The "subject" and HTML "message"
+// fields support the new bulk email UI.
 app.post("/send", upload.single("attachment"), async (req, res) => {
-  const { name, email, message } = req.body;
+  const { name, email, subject, message, replyTo } = req.body;
 
-  if (!name || !email || !message) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: "Name, email, and message are required.",
-      });
+  if (!email || !message) {
+    return res.status(400).json({
+      success: false,
+      error: "Email and message are required.",
+    });
   }
 
-  // ─── 2. MAIL OPTIONS — admin notification ───────────────────────
-  const adminMailOptions = {
-    from: `"${name}" <${process.env.EMAIL_USER}>`,
-    to: process.env.RECEIVER,
-    subject: `New message from ${name}`,
-    text: `From: ${name} (${email})\n\n${message}`,
-    html: `
-      <h2>New contact form submission</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Message:</strong><br/>${message}</p>
-    `,
+  // ─── 2. MAIL OPTIONS ───────────────────────────────────────
+  const mailOptions = {
+    from: `"${name || "Nodemailer Test"}" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: subject || `Message from ${name || "Nodemailer Test"}`,
+    html: message,
+    // Plain text fallback (strip HTML tags)
+    text: message.replace(/<[^>]*>/g, ""),
     // Attachment is included only if a file was uploaded
     attachments: req.file
       ? [{ filename: req.file.originalname, path: req.file.path }]
       : [],
   };
 
-  // ─── 2. MAIL OPTIONS — auto-reply to the sender ─────────────────
-  const autoReplyOptions = {
-    from: `"Contact Mailer" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "We received your message",
-    html: `
-      <p>Hi ${name},</p>
-      <p>Thanks for reaching out — we've received your message and will get back to you soon.</p>
-      <p><em>Your message:</em> "${message}"</p>
-    `,
-  };
+  // Add reply-to if provided
+  if (replyTo) {
+    mailOptions.replyTo = replyTo;
+  }
 
-  // ─── 3. SEND ─────────────────────────────────────────────────────
+  // ─── 3. SEND ─────────────────────────────────────────────
   try {
-    const adminInfo = await transporter.sendMail(adminMailOptions);
-    const replyInfo = await transporter.sendMail(autoReplyOptions);
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`📧 Sent to ${email} — messageId: ${info.messageId}`);
 
     res.json({
       success: true,
-      adminMessageId: adminInfo.messageId,
-      replyMessageId: replyInfo.messageId,
+      messageId: info.messageId,
     });
   } catch (err) {
-    console.error(err);
+    console.error(`❌ Failed to send to ${email}:`, err.message);
 
     let userMessage = "Failed to send email. Please try again later.";
     switch (err.code) {
@@ -112,7 +101,7 @@ app.post("/send", upload.single("attachment"), async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
 app.listen(PORT, () =>
   console.log(` Server running on http://localhost:${PORT}`),
 );

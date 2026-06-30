@@ -3,88 +3,319 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact Us</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 480px;
-        margin: 60px auto;
-        padding: 0 20px;
-      }
-      h1 {
-        font-size: 22px;
-      }
-      input,
-      textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 6px 0 16px;
-        box-sizing: border-box;
-      }
-      button {
-        padding: 10px 20px;
-        cursor: pointer;
-      }
-      #status {
-        margin-top: 14px;
-        font-weight: bold;
-      }
-    </style>
+    <title>Nodemailer Test — Bulk Email Sender</title>
+    <meta name="description" content="Send bulk emails efficiently with Nodemailer Test. Manage recipients, compose campaigns, and track delivery." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Contact Us</h1>
-    <form id="contactForm">
-      <label for="name">Name</label>
-      <input id="name" name="name" placeholder="Your name" required />
 
-      <label for="email">Email</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        placeholder="you@example.com"
-        required
-      />
+    <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <span class="material-icons-outlined brand-icon">mail</span>
+        <span class="brand-name">Nodemailer Test</span>
+      </div>
 
-      <label for="message">Message</label>
-      <textarea
-        id="message"
-        name="message"
-        rows="5"
-        placeholder="Your message"
-        required
-      ></textarea>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="compose" id="nav-compose">
+          <span class="material-icons-outlined">edit</span>
+          <span>Compose</span>
+        </a>
+        <a href="#" class="nav-item" data-view="history" id="nav-history">
+          <span class="material-icons-outlined">history</span>
+          <span>Sent History</span>
+        </a>
+        <a href="#" class="nav-item" data-view="contacts" id="nav-contacts">
+          <span class="material-icons-outlined">contacts</span>
+          <span>Contacts</span>
+        </a>
+      </nav>
 
-      <label for="attachment">Attachment (optional)</label>
-      <input id="attachment" name="attachment" type="file" />
+      <div class="sidebar-footer">
+        <div class="quota-info">
+          <div class="quota-label">
+            <span>Daily quota</span>
+            <span id="quota-count">0 / 500</span>
+          </div>
+          <div class="quota-bar">
+            <div class="quota-fill" id="quota-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
 
-      <button type="submit">Send</button>
-    </form>
-    <p id="status"></p>
+    <!-- ═══════════════════════ MAIN AREA ═══════════════════════ -->
+    <main class="main-content">
 
-    <script>
-      document
-        .getElementById("contactForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const statusEl = document.getElementById("status");
-          statusEl.textContent = "Sending...";
+      <!-- ─── Top bar ─── -->
+      <header class="topbar">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+          <span class="material-icons-outlined">menu</span>
+        </button>
+        <h1 class="page-title" id="page-title">Compose Campaign</h1>
+        <div class="topbar-right">
+          <div class="connection-badge" id="connection-badge">
+            <span class="status-dot"></span>
+            <span>Connected</span>
+          </div>
+        </div>
+      </header>
 
-          const formData = new FormData(e.target);
+      <!-- ═══════════ VIEW: COMPOSE ═══════════ -->
+      <section class="view active" id="view-compose">
+        <div class="compose-layout">
 
-          try {
-            const res = await fetch("/send", {
-              method: "POST",
-              body: formData,
-            });
-            const data = await res.json();
-            statusEl.textContent = data.success
-              ? " Message sent! Check your inbox for a confirmation."
-              : " " + data.error;
-          } catch (err) {
-            statusEl.textContent = " Network error. Is the server running?";
-          }
-        });
-    </script>
+          <!-- LEFT: Compose form -->
+          <div class="compose-form-wrapper">
+            <form id="composeForm" enctype="multipart/form-data">
+              <!-- Recipients -->
+              <div class="form-group">
+                <label for="recipients">Recipients <span class="required">*</span></label>
+                <div class="recipients-input-wrapper">
+                  <textarea
+                    id="recipients"
+                    name="recipients"
+                    rows="3"
+                    placeholder="Enter email addresses separated by commas or new lines&#10;e.g. john@example.com, jane@company.org"
+                    required
+                  ></textarea>
+                  <div class="recipients-actions">
+                    <button type="button" class="btn-text" id="btn-import-csv" title="Import from CSV">
+                      <span class="material-icons-outlined">upload_file</span>
+                      Import CSV
+                    </button>
+                    <span class="recipient-count" id="recipient-count">0 recipients</span>
+                  </div>
+                </div>
+                <input type="file" id="csv-file-input" style="display:none" />
+              </div>
+
+              <!-- Subject -->
+              <div class="form-group">
+                <label for="subject">Subject <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  placeholder="e.g. Monthly Newsletter — July 2026"
+                  required
+                />
+              </div>
+
+              <!-- Sender name -->
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="senderName">Sender Name</label>
+                  <input
+                    type="text"
+                    id="senderName"
+                    name="senderName"
+                    placeholder="e.g. Acme Corp"
+                  />
+                </div>
+                <div class="form-group flex-1">
+                  <label for="replyTo">Reply-To (optional)</label>
+                  <input
+                    type="email"
+                    id="replyTo"
+                    name="replyTo"
+                    placeholder="replies@yourcompany.com"
+                  />
+                </div>
+              </div>
+
+              <!-- Message body -->
+              <div class="form-group">
+                <label for="message">Message Body <span class="required">*</span></label>
+                <div class="editor-toolbar">
+                  <button type="button" class="toolbar-btn" title="Bold" data-cmd="bold"><b>B</b></button>
+                  <button type="button" class="toolbar-btn" title="Italic" data-cmd="italic"><i>I</i></button>
+                  <button type="button" class="toolbar-btn" title="Underline" data-cmd="underline"><u>U</u></button>
+                  <span class="toolbar-divider"></span>
+                  <button type="button" class="toolbar-btn" title="Bullet list" data-cmd="insertUnorderedList">
+                    <span class="material-icons-outlined" style="font-size:16px">format_list_bulleted</span>
+                  </button>
+                  <button type="button" class="toolbar-btn" title="Numbered list" data-cmd="insertOrderedList">
+                    <span class="material-icons-outlined" style="font-size:16px">format_list_numbered</span>
+                  </button>
+                  <span class="toolbar-divider"></span>
+                  <button type="button" class="toolbar-btn" title="Insert link" data-cmd="createLink">
+                    <span class="material-icons-outlined" style="font-size:16px">link</span>
+                  </button>
+                  <div class="toolbar-right">
+                    <label class="toggle-html-label">
+                      <input type="checkbox" id="toggle-html" />
+                      <span>HTML</span>
+                    </label>
+                  </div>
+                </div>
+                <div
+                  id="editor"
+                  class="rich-editor"
+                  contenteditable="true"
+                  data-placeholder="Write your email content here..."
+                ></div>
+                <textarea id="html-source" class="html-source" style="display:none" placeholder="Paste raw HTML here..."></textarea>
+              </div>
+
+              <!-- Attachment -->
+              <div class="form-group">
+                <label>Attachment (optional)</label>
+                <div class="file-drop-zone" id="file-drop-zone">
+                  <span class="material-icons-outlined">attach_file</span>
+                  <span>Drag & drop or <u>browse</u> — max 5 MB</span>
+                  <input type="file" id="attachment" name="attachment" />
+                </div>
+                <div class="attached-file" id="attached-file" style="display:none">
+                  <span class="material-icons-outlined">description</span>
+                  <span id="attached-file-name"></span>
+                  <button type="button" class="btn-icon" id="btn-remove-file" title="Remove">
+                    <span class="material-icons-outlined">close</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Send -->
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="btn-preview">
+                  <span class="material-icons-outlined">visibility</span>
+                  Preview
+                </button>
+                <button type="submit" class="btn btn-primary" id="btn-send">
+                  <span class="material-icons-outlined">send</span>
+                  Send Campaign
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: Live status panel -->
+          <div class="status-panel" id="status-panel">
+            <div class="panel-header">
+              <h3>Delivery Status</h3>
+            </div>
+            <div class="panel-body" id="send-status-body">
+              <div class="empty-state">
+                <span class="material-icons-outlined empty-icon">outgoing_mail</span>
+                <p>No emails sent yet.<br/>Compose and send your first campaign.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════════ VIEW: HISTORY ═══════════ -->
+      <section class="view" id="view-history">
+        <div class="history-wrapper">
+          <div class="history-header">
+            <h2>Sent History</h2>
+            <button class="btn btn-secondary btn-sm" id="btn-clear-history">
+              <span class="material-icons-outlined">delete_sweep</span>
+              Clear All
+            </button>
+          </div>
+          <div class="history-list" id="history-list">
+            <div class="empty-state">
+              <span class="material-icons-outlined empty-icon">inbox</span>
+              <p>No campaigns sent yet.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ VIEW: CONTACTS ═══════════ -->
+      <section class="view" id="view-contacts">
+        <div class="contacts-wrapper">
+          <div class="contacts-header">
+            <h2>Saved Contacts</h2>
+            <div class="contacts-actions-top">
+              <button class="btn btn-secondary btn-sm" id="btn-add-contact">
+                <span class="material-icons-outlined">person_add</span>
+                Add Contact
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-export-contacts">
+                <span class="material-icons-outlined">download</span>
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="contacts-search">
+            <span class="material-icons-outlined search-icon">search</span>
+            <input type="text" id="contacts-search-input" placeholder="Search contacts..." />
+          </div>
+          <div class="contacts-list" id="contacts-list">
+            <div class="empty-state">
+              <span class="material-icons-outlined empty-icon">people_outline</span>
+              <p>No contacts saved.<br/>Add contacts manually or import from CSV.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ═══════════ MODAL: Preview ═══════════ -->
+    <div class="modal-overlay" id="modal-preview" style="display:none">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Email Preview</h3>
+          <button class="btn-icon" id="btn-close-preview">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-meta">
+            <div><strong>To:</strong> <span id="preview-to"></span></div>
+            <div><strong>Subject:</strong> <span id="preview-subject"></span></div>
+            <div><strong>From:</strong> <span id="preview-from"></span></div>
+          </div>
+          <hr />
+          <div class="preview-body" id="preview-body"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-close-preview-2">Close</button>
+          <button class="btn btn-primary" id="btn-send-from-preview">
+            <span class="material-icons-outlined">send</span>
+            Send Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ MODAL: Add contact ═══════════ -->
+    <div class="modal-overlay" id="modal-add-contact" style="display:none">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3>Add Contact</h3>
+          <button class="btn-icon" id="btn-close-add-contact">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="contact-name">Name</label>
+            <input type="text" id="contact-name" placeholder="John Doe" />
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email <span class="required">*</span></label>
+            <input type="email" id="contact-email" placeholder="john@example.com" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-add-contact">Cancel</button>
+          <button class="btn btn-primary" id="btn-save-contact">Save Contact</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ TOAST ═══════════ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
   </body>
 </html>
