@@ -31,7 +31,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
   const [sending, setSending] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  // Status panel state
   const [statusPanel, setStatusPanel] = useState(null);
 
   const editorRef = useRef(null);
@@ -41,7 +40,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
   const emails = parseRecipients(recipients);
   const recipientCount = emails.length;
 
-  // ─── Toolbar commands ───────────────────────────────────
   const execCommand = useCallback((cmd) => {
     if (cmd === "createLink") {
       const url = prompt("Enter URL:");
@@ -52,13 +50,10 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
     editorRef.current?.focus();
   }, []);
 
-  // ─── HTML toggle ────────────────────────────────────────
   const handleHtmlToggle = useCallback(() => {
     if (!htmlMode) {
-      // Switching TO html source
       setHtmlSource(editorRef.current?.innerHTML || "");
     } else {
-      // Switching FROM html source back to rich editor
       if (editorRef.current) {
         editorRef.current.innerHTML = htmlSource;
       }
@@ -66,7 +61,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
     setHtmlMode((prev) => !prev);
   }, [htmlMode, htmlSource]);
 
-  // ─── CSV Import ─────────────────────────────────────────
   const handleCsvImport = useCallback(
     (e) => {
       const file = e.target.files[0];
@@ -100,7 +94,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
     [showToast]
   );
 
-  // ─── File attachment ────────────────────────────────────
   const handleFileChange = useCallback(
     (e) => {
       const f = e.target.files[0];
@@ -120,12 +113,10 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
-  // ─── Get message body ──────────────────────────────────
   const getMessageBody = useCallback(() => {
     return htmlMode ? htmlSource : editorRef.current?.innerHTML || "";
   }, [htmlMode, htmlSource]);
 
-  // ─── Preview ────────────────────────────────────────────
   const previewData = {
     to: emails.length
       ? emails.slice(0, 3).join(", ") +
@@ -136,7 +127,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
     body: getMessageBody(),
   };
 
-  // ─── Send ───────────────────────────────────────────────
   const submitForm = useCallback(async () => {
     const messageBody = getMessageBody();
 
@@ -253,10 +243,8 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
   return (
     <section className="view active" id="view-compose">
       <div className="compose-layout">
-        {/* LEFT: Compose form */}
         <div className="compose-form-wrapper">
           <form id="composeForm" encType="multipart/form-data" onSubmit={handleSubmit}>
-            {/* Recipients */}
             <div className="form-group">
               <label htmlFor="recipients">
                 Recipients <span className="required">*</span>
@@ -297,7 +285,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
               />
             </div>
 
-            {/* Subject */}
             <div className="form-group">
               <label htmlFor="subject">
                 Subject <span className="required">*</span>
@@ -313,7 +300,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
               />
             </div>
 
-            {/* Sender name & Reply-to */}
             <div className="form-row">
               <div className="form-group flex-1">
                 <label htmlFor="senderName">Sender Name</label>
@@ -339,7 +325,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
               </div>
             </div>
 
-            {/* Message body */}
             <div className="form-group">
               <label htmlFor="editor">
                 Message Body <span className="required">*</span>
@@ -440,7 +425,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
               />
             </div>
 
-            {/* Attachment */}
             <div className="form-group">
               <label>Attachment (optional)</label>
               {!attachment ? (
@@ -476,7 +460,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
               )}
             </div>
 
-            {/* Send */}
             <div className="form-actions">
               <button
                 type="button"
@@ -501,7 +484,6 @@ export default function ComposeView({ showToast, onEmailsSent, token }) {
           </form>
         </div>
 
-        {/* RIGHT: Live status panel */}
         <div className="status-panel" id="status-panel">
           <div className="panel-header">
             <h3>Delivery Status</h3>

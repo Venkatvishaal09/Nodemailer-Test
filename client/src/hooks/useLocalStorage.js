@@ -14,7 +14,6 @@ export default function useLocalStorage(key, initialValue) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
-      // Storage full or unavailable
     }
   }, [key, value]);
 

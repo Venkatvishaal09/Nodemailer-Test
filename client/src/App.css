@@ -1,17 +1,13 @@
-/* ═══════════════════════════════════════════════════════════
    MailPulse — Bulk Email Sender
    A clean, professional UI that feels like a real product.
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── Reset & Base ──────────────────────────────────────── */
-*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 :root {
-  /* Neutral palette */
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
@@ -23,7 +19,6 @@
   --gray-800: #1f2937;
   --gray-900: #111827;
 
-  /* Brand — a muted teal-blue, not flashy */
   --brand-50: #eef7f9;
   --brand-100: #d0ebf0;
   --brand-200: #a1d7e2;
@@ -32,7 +27,6 @@
   --brand-600: #1a7a8c;
   --brand-700: #155f6d;
 
-  /* Accent */
   --green-500: #16a34a;
   --green-100: #dcfce7;
   --red-500: #dc2626;
@@ -40,19 +34,16 @@
   --amber-500: #d97706;
   --amber-100: #fef3c7;
 
-  /* Layout */
   --sidebar-w: 240px;
   --topbar-h: 56px;
   --radius: 6px;
   --radius-lg: 10px;
 
-  /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
   --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
   --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
   --shadow-lg: 0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.04);
 
-  /* Transition */
   --ease: cubic-bezier(.4,0,.2,1);
 }
 
@@ -67,7 +58,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── Sidebar ───────────────────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--gray-900);
@@ -165,7 +155,6 @@ body {
   transition: width .4s var(--ease);
 }
 
-/* ─── Main Content ──────────────────────────────────────── */
 .main-content {
   margin-left: var(--sidebar-w);
   flex: 1;
@@ -229,11 +218,9 @@ body {
 
 .connection-badge.error .status-dot { background: var(--red-500); }
 
-/* ─── Views ─────────────────────────────────────────────── */
 .view { display: none; padding: 24px; flex: 1; }
 .view.active { display: block; }
 
-/* ─── Compose Layout ────────────────────────────────────── */
 .compose-layout {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -249,7 +236,6 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* ─── Form elements ─────────────────────────────────────── */
 .form-group {
   margin-bottom: 20px;
 }
@@ -297,7 +283,6 @@ body {
 
 .flex-1 { flex: 1; }
 
-/* Recipients area */
 .recipients-input-wrapper { position: relative; }
 
 .recipients-actions {
@@ -312,7 +297,6 @@ body {
   color: var(--gray-500);
 }
 
-/* ─── Rich editor ───────────────────────────────────────── */
 .editor-toolbar {
   display: flex;
   align-items: center;
@@ -406,7 +390,6 @@ body {
   box-shadow: 0 0 0 3px rgba(59,172,197,.12);
 }
 
-/* ─── File upload ───────────────────────────────────────── */
 .file-drop-zone {
   display: flex;
   align-items: center;
@@ -455,7 +438,6 @@ body {
   color: var(--brand-500);
 }
 
-/* ─── Buttons ───────────────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -541,7 +523,6 @@ body {
   border-top: 1px solid var(--gray-100);
 }
 
-/* ─── Status Panel ──────────────────────────────────────── */
 .status-panel {
   background: #fff;
   border: 1px solid var(--gray-200);
@@ -571,7 +552,6 @@ body {
   padding: 16px 20px;
 }
 
-/* Progress */
 .send-progress {
   margin-bottom: 16px;
 }
@@ -630,7 +610,6 @@ body {
 .stat-card.success .stat-value { color: var(--green-500); }
 .stat-card.failed .stat-value { color: var(--red-500); }
 
-/* Log items */
 .log-list {
   display: flex;
   flex-direction: column;
@@ -667,7 +646,6 @@ body {
   white-space: nowrap;
 }
 
-/* Empty state */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -688,7 +666,6 @@ body {
   line-height: 1.5;
 }
 
-/* ─── History ───────────────────────────────────────────── */
 .history-wrapper,
 .contacts-wrapper {
   max-width: 800px;
@@ -751,7 +728,6 @@ body {
 
 .history-card-stats .material-icons-outlined { font-size: 15px; }
 
-/* ─── Contacts ──────────────────────────────────────────── */
 .contacts-actions-top {
   display: flex;
   gap: 8px;
@@ -837,7 +813,6 @@ body {
   gap: 4px;
 }
 
-/* ─── Modals ────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -904,7 +879,6 @@ body {
   color: var(--gray-800);
 }
 
-/* ─── Toast ─────────────────────────────────────────────── */
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -948,7 +922,6 @@ body {
   border: 1px solid var(--brand-200);
 }
 
-/* ─── Animations ────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -964,7 +937,6 @@ body {
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .compose-layout {
     grid-template-columns: 1fr;
@@ -999,13 +971,11 @@ body {
   }
 }
 
-/* ─── Scrollbar (subtle) ────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
 
-/* ─── Loading spinner for send button ───────────────────── */
 .btn-primary.sending {
   pointer-events: none;
   opacity: .75;
@@ -1020,7 +990,6 @@ body {
   to   { transform: rotate(360deg); }
 }
 
-/* --- Login View ------------------------------------------ */
 .login-container {
   display: flex;
   align-items: center;

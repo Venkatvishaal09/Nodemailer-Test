@@ -56,9 +56,6 @@ export default function App() {
     (email) => {
       showToast("info", `Added ${email} to recipients`);
       handleNavigate("compose");
-      // Note: The compose view manages its own recipients state.
-      // A more advanced approach would use a shared context, but for
-      // simplicity the toast informs the user to paste the email.
     },
     [showToast, handleNavigate]
   );

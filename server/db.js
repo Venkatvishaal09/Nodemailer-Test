@@ -2,7 +2,6 @@ const { Pool } = require("pg");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Require SSL in production environments like Neon/Supabase
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
@@ -13,7 +12,6 @@ const initDB = async () => {
       return;
     }
     
-    // Create users table if it doesn't exist
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
