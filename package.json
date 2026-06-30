@@ -9,6 +9,7 @@
     "client": "npm run dev --prefix client",
     "dev": "concurrently \"node server/index.js\" \"npm run dev --prefix client\"",
     "build": "npm run build --prefix client",
+    "vercel-build": "npm install --prefix client && npm run build --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
