@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 
 // Log whenever Nodemailer generates a fresh access token using the refresh token
 transporter.on("token", (token) => {
-  console.log("🔄 New access token generated for", token.user);
+  console.log(" New access token generated for", token.user);
 });
 
 // Verify connection as soon as the server starts
