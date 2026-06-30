@@ -1,10 +1,10 @@
 # Nodemailer Bulk Email Sender
 
-A full-stack web application designed for sending emails and managing email campaigns securely. It features a premium, responsive React frontend and a powerful Express/Node.js backend, protected by JWT authentication and backed by a PostgreSQL database.
+Uses React frontend and Express/Node.js backend, with JWT authentication and  a PostgreSQL database.
 
 ## Features
 
-- **Full-Stack Architecture**: React 19 + Vite on the frontend, Express 5 on the backend.
+- ** Architecture**: React 19 + Vite on the frontend, Express 5 on the backend.
 - **Secure Authentication**: User sign-up and sign-in powered by PostgreSQL and bcrypt password hashing.
 - **JWT Sessions**: API routes are protected using JSON Web Tokens (JWT).
 - **OAuth2 Email Delivery**: Uses the Nodemailer library integrated with Gmail's OAuth2 API, which is far more secure than using App Passwords.
